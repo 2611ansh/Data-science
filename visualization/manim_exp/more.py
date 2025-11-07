@@ -1,5 +1,6 @@
 from manim import *
 
+
 class MovingFrame(Scene):
      def construct(self):
         # Write equations
@@ -18,7 +19,7 @@ class MovingFrame(Scene):
         self.wait()
         # replace frame 1 with frame 2
         self.play(ReplacementTransform(framebox1, framebox2))
-    
+
         self.wait()
 
 
@@ -59,40 +60,26 @@ class MovingAndZoomingCamera(MovingCameraScene):
         self.wait(0.3)
         self.play(self.camera.frame.animate.move_to(equation[2]).set(width=equation[2].width*2))
 
-class Graph(GraphScene):
-    def __init__(self, **kwargs):
-        GraphScene.__init__(
-            self,
-            x_min=-3.5,
-            x_max=3.5,
-            y_min=-5,
-            y_max=5,
-            graph_origin=ORIGIN,
-            axes_color=BLUE,
-            x_labeled_nums=range(-4, 4, 2), # x tickers
-            y_labeled_nums=range(-5, 5, 2), # y tickers
-            **kwargs
+class Graph(Scene):
+    def construct(self):
+        axes = Axes(
+            x_range=[-3, 3, 1],
+            y_range=[-5, 5, 1],
+            x_length=6,
+            y_length=6,
         )
 
-    def construct(self):
-        self.setup_axes(animate=True)
+        # Add labels
+        axes_labels = axes.get_axis_labels(x_label="x", y_label="f(x)")
 
-        # Draw graph
-        func_graph_cube = self.get_graph(lambda x: x**3, RED)
-        func_graph_ncube = self.get_graph(lambda x: -x**3, GREEN)
+        # Create function graphs
+        graph = axes.plot(lambda x: x**2, color=BLUE)
+        graph_label = axes.get_graph_label(graph, label="x^2")
 
-        # Create labels
-        graph_lab = self.get_graph_label(func_graph_cube, label="x^3")
-        graph_lab2 = self.get_graph_label(func_graph_ncube, label="-x^3", x_val=-3)
-
-        # Create a vertical line
-        vert_line = self.get_vertical_line_to_graph(1.5, func_graph_cube, color=YELLOW)
-        label_coord = self.input_to_graph_point(1.5, func_graph_cube)
-        text = MathTex(r"x=1.5")
-        text.next_to(label_coord)
-       
-        self.add(func_graph_cube, func_graph_ncube, graph_lab, graph_lab2, vert_line, text)
-        self.wait(3)
+        self.add(axes, axes_labels)
+        self.play(Create(graph))
+        self.play(Write(graph_label))
+        self.wait()
 
 class GroupCircles(Scene):
     def construct(self):
@@ -101,11 +88,11 @@ class GroupCircles(Scene):
         circle_green = Circle(color=GREEN)
         circle_blue = Circle(color=BLUE)
         circle_red = Circle(color=RED)
-        
+
         # Set initial positions
         circle_green.shift(LEFT)
         circle_blue.shift(RIGHT)
-        
+
         # Create 2 different groups
         gr = VGroup(circle_green, circle_red)
         gr2 = VGroup(circle_blue)
@@ -113,7 +100,7 @@ class GroupCircles(Scene):
         self.wait()
 
         self.play((gr + gr2).animate.shift(DOWN)) # shift 2 groups down
-        
+
         self.play(gr.animate.shift(RIGHT)) # move only 1 group
         self.play(gr.animate.shift(UP))
 
@@ -138,3 +125,69 @@ class TracedPathExample(Scene):
         # Shift the circle to 8*RIGHT
         self.play(rolling_circle.animate.shift(8*RIGHT), run_time=4, rate_func=linear)
 
+class WriteEquation(Scene):
+    def construct(self):
+        equation = MathTex(r"e^{i\pi} + 1 = 0")
+
+        self.play(Write(equation))
+        self.wait()
+
+class EquationSteps(Scene):
+    def construct(self):
+        step1 = MathTex(r"2x + 5 = 13")
+        step2 = MathTex(r"2x = 8")
+        step3 = MathTex(r"x = 4")
+
+        self.play(Write(step1))
+        self.wait()
+        self.play(Transform(step1, step2))
+        self.wait()
+        self.play(Transform(step1, step3))
+        self.wait()
+
+class MovingCamera(MovingCameraScene):
+    def construct(self):
+        equation = MathTex(
+            r"\frac{d}{dx}(x^2) = 2x"
+        )
+
+        self.play(Write(equation))
+        self.wait()
+
+        # Zoom in on the derivative
+        self.play(
+            self.camera.frame.animate.scale(0.5).move_to(equation[0])
+        )
+        self.wait()
+
+class MoveObjectsTogether(Scene):
+    def construct(self):
+        square = Square(color=BLUE)
+        circle = Circle(color=RED)
+
+        # Group objects
+        group = VGroup(square, circle)
+        group.arrange(RIGHT, buff=1)
+
+        self.play(Create(group))
+        self.wait()
+
+        # Move the entire group
+        self.play(group.animate.shift(UP * 2))
+        self.wait()
+
+class TracePath(Scene):
+    def construct(self):
+        dot = Dot(color=RED)
+
+        # Create traced path
+        path = TracedPath(dot.get_center, stroke_color=BLUE, stroke_width=4)
+        self.add(path, dot)
+
+        # Move the dot in a circular pattern
+        self.play(
+            MoveAlongPath(dot, Circle(radius=2)),
+            rate_func=linear,
+            run_time=4
+        )
+        self.wait()

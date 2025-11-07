@@ -1,25 +1,34 @@
-from manim import * 
+from manim import *
 
-config.background_color = DARK_GRAY
 
-from manim import * 
-
-class PointMovingOnShapes(Scene):
+class GrowingSquare(Scene):
     def construct(self):
-        
-        # Create a square
-        square = Square(color=BLUE)
-        square.flip(RIGHT)
-        square.rotate(-3 * TAU / 8)
-        
-        # Create a circle
+        square = Square(color=BLUE, fill_opacity=0.5)
+        self.play(GrowFromCenter(square))
+        self.wait()
+
+class SquareToCircle(Scene):
+    def construct(self):
         circle = Circle()
         circle.set_fill(PINK, opacity=0.5)
-        
-        # Create animations
-        self.play(GrowFromCenter(square))
-        self.play(Transform(square, circle)) 
-       
+
+        square = Square()
+        square.rotate(PI / 4)
+
+        self.play(Create(square))
+        self.play(Transform(square, circle))
+        self.play(FadeOut(square))
+
+class CustomBackground(Scene):
+    def construct(self):
+        self.camera.background_color = WHITE
+
+        square = Square(color=BLUE, fill_opacity=0.5)
+        circle = Circle(color=RED, fill_opacity=0.5)
+
+        self.play(Create(square))
+        self.wait()
+        self.play(Transform(square, circle))
         self.wait()
 
 
